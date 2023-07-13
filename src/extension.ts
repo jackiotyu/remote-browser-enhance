@@ -5,6 +5,8 @@ import {ConnConfig} from './ConnConfig';
 
 import { RemoteFileTreeProvider } from './RemoteFileTreeProvider';
 
+import { DnDController } from './DnDController';
+
 // Quick pick item
 class QPItem implements vscode.QuickPickItem {
     public label: string;
@@ -93,8 +95,15 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(cpCmd);
     context.subscriptions.push(opCmd);
     context.subscriptions.push(connCmd);
-    context.subscriptions.push(vscode.window.registerTreeDataProvider('remoteExplorer', remoteTree));
 
+    const remoteExplorer = vscode.window.createTreeView('remoteExplorer', {
+        treeDataProvider: remoteTree,
+        manageCheckboxStateManually: true,
+        showCollapseAll: true,
+        dragAndDropController: new DnDController()
+    });
+
+    context.subscriptions.push(remoteExplorer);
 }
 
 export function deactivate() {

@@ -18,6 +18,8 @@ export class FileNode extends TreeItem {
             this.remotePath = filename;
         }
 
+        this.tooltip = this.remotePath;
+
         this.isDir = isDir;
         this.resourceUri = Uri.parse(filename);
         this.contextValue = this.isDir ? 'remoteExplorer.Dir' : 'remoteExplorer.File';
