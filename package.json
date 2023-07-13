@@ -70,6 +70,11 @@
                 "command": "remoteBrowserEnhance.disconnect",
                 "title": "remote-browser-enhance: Disconnect",
                 "icon": "$(debug-disconnect)"
+            },
+            {
+                "command": "remoteBrowserEnhance.terminal",
+                "title": "remote-browser-enhance: Terminal",
+                "icon": "$(terminal-bash)"
             }
         ],
         "views": {
@@ -94,6 +99,11 @@
                 },
                 {
                     "command": "remoteBrowserEnhance.disconnect",
+                    "when": "view == remoteExplorer",
+                    "group": "navigation@0"
+                },
+                {
+                    "command": "remoteBrowserEnhance.terminal",
                     "when": "view == remoteExplorer",
                     "group": "navigation@0"
                 }
