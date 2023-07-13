@@ -1,32 +1,30 @@
 {
-    "name": "remote-browser",
-    "displayName": "remote-browser",
+    "name": "remote-browser-enhance",
+    "displayName": "remote-browser-enhance",
     "description": "Browse and edit remote files over sftp",
-    "version": "0.7.2",
-    "publisher": "sprdp",
+    "version": "0.0.1",
+    "publisher": "jackiotyu",
     "license": "MIT",
-    "author": "Supradeep Allu <supradeep95@gmail.com>",
+    "author": "jackiotyu <2504448153@qq.com>",
     "icon": "icon.png",
     "repository": {
         "type": "git",
-        "url": "https://github.com/supradeep95/remote-browser.git"
+        "url": "https://github.com/jackiotyu/remote-browser-enhance.git"
     },
     "engines": {
-        "vscode": "^1.23.0"
+        "vscode": "^1.78.0"
     },
     "categories": [
         "Other"
     ],
-    "activationEvents": [
-        "onCommand:remoteBrowser.connect"
-    ],
-    "main": "./out/extension",
+    "activationEvents": [],
+    "main": "./dist/extension",
     "contributes": {
         "configuration": {
             "type": "object",
-            "title": "remote-browser configuration",
+            "title": "remote-browser-enhance configuration",
             "properties": {
-                "remoteBrowser.tmpFolder": {
+                "remoteBrowserEnhance.tmpFolder": {
                     "type": [
                         "string",
                         null
@@ -34,7 +32,7 @@
                     "default": null,
                     "description": "Local temp folder for storing downloaded files. defaults to os.tmpdir()"
                 },
-                "remoteBrowser.connectionOptions": {
+                "remoteBrowserEnhance.connectionOptions": {
                     "type": "object",
                     "default": {
                         "host": "127.0.0.1",
@@ -42,37 +40,36 @@
                     },
                     "description": "ssh2 Connection args. Supports a subset of the ssh2::ConnectConfig options from the 'ssh2' library\n host  - Remote Host\n port - Port number(Defaults to 22) \nusername  - Username for authentication \n password  - Password for password-based user authentication (NOT RECOMMENDED STORING HERE! EITHER USE KEY-BASED AUTH OR ENTER PASSWORD IN PROMPT)\n agent - Path to ssh-agent's UNIX socket for ssh-agent-based user authentication \n privateKey - Path to a private key file for either key-based or hostbased user authentication \n passphrase - For an encrypted private key, this is the passphrase used to decrypt it. \n localHostname - Along with `localUsername` and `privateKey`, set this to a non-empty string for hostbased user authentication \n localUsername - Along with `localHostname` and `privateKey`, set this to a non-empty string for hostbased user authentication \n defaultPath - Default directory to start in on connect (Absolute path)"
                 },
-                "remoteBrowser.additionalConnections": {
+                "remoteBrowserEnhance.additionalConnections": {
                     "type": "array",
                     "default": [],
-                    "description": "Array of additional connections. Members must be objects of the same type as remoteBrowser.connectionOptions."
+                    "description": "Array of additional connections. Members must be objects of the same type as remoteBrowserEnhance.connectionOptions."
                 }
             }
         },
         "commands": [
             {
-                "command": "remoteBrowser.connect",
-                "title": "remote-browser: Connect"
+                "command": "remoteBrowserEnhance.connect",
+                "title": "remote-browser-enhance: Connect",
+                "icon": "$(vm-connect)"
             },
             {
-                "command": "remoteBrowser.changePath",
-                "title": "remote-browser: Change Root Path"
+                "command": "remoteBrowserEnhance.changePath",
+                "title": "remote-browser-enhance: Change Root Path"
             },
             {
-                "command": "remoteBrowser.makeRoot",
-                "title": "remote-browser: Make root"
+                "command": "remoteBrowserEnhance.makeRoot",
+                "title": "remote-browser-enhance: Make root"
             },
             {
-                "command": "remoteBrowser.filter",
-                "title": "remote-browser: Filter",
-                "icon": {
-                    "light": "resources/filter_light.png",
-                    "dark": "resources/filter_dark.png"
-                }
+                "command": "remoteBrowserEnhance.filter",
+                "title": "remote-browser-enhance: Filter",
+                "icon": "$(filter)"
             },
             {
-                "command": "remoteBrowser.disconnect",
-                "title": "remote-browser: Disconnect"
+                "command": "remoteBrowserEnhance.disconnect",
+                "title": "remote-browser-enhance: Disconnect",
+                "icon": "$(debug-disconnect)"
             }
         ],
         "views": {
@@ -86,33 +83,55 @@
         "menus": {
             "view/title": [
                 {
-                    "command": "remoteBrowser.filter",
+                    "command": "remoteBrowserEnhance.filter",
+                    "when": "view == remoteExplorer",
+                    "group": "navigation@0"
+                },
+                {
+                    "command": "remoteBrowserEnhance.connect",
+                    "when": "view == remoteExplorer",
+                    "group": "navigation@0"
+                },
+                {
+                    "command": "remoteBrowserEnhance.disconnect",
                     "when": "view == remoteExplorer",
                     "group": "navigation@0"
                 }
             ],
             "view/item/context": [
                 {
-                    "command": "remoteBrowser.makeRoot",
-                    "when": "view == remoteExplorer",
+                    "command": "remoteBrowserEnhance.makeRoot",
+                    "when": "view == remoteExplorer && viewItem === remoteExplorer.Dir",
                     "group": "navigation"
                 }
             ]
         }
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+        "vscode:prepublish": "yarn run package",
+        "compile": "webpack",
+        "watch": "webpack --watch",
+        "package": "webpack --mode production --devtool hidden-source-map",
+        "compile-tests": "tsc -p . --outDir out",
+        "watch-tests": "tsc -p . -w --outDir out",
+        "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
+        "lint": "eslint src --ext ts",
+        "test": "node ./out/test/runTest.js"
     },
     "devDependencies": {
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^7.10.2",
-        "tslint": "^5.12.1",
-        "typescript": "^2.9.2",
-        "vscode": "^1.1.29"
+        "@types/vscode": "^1.78.0",
+        "@types/glob": "^8.1.0",
+        "@types/mocha": "^10.0.1",
+        "@types/node": "16.x",
+        "@typescript-eslint/eslint-plugin": "^5.59.1",
+        "@typescript-eslint/parser": "^5.59.1",
+        "eslint": "^8.39.0",
+        "glob": "^8.1.0",
+        "mocha": "^10.2.0",
+        "typescript": "^5.0.4",
+        "ts-loader": "^9.4.2",
+        "webpack": "^5.81.0",
+        "webpack-cli": "^5.0.2"
     },
     "dependencies": {
         "@types/ssh2-sftp-client": "^2.4.0",

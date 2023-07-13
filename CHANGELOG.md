@@ -1,5 +1,5 @@
 # Change Log
-All notable changes to the "remote-browser" extension will be documented in this file.
+All notable changes to the "remote-browser-enhance" extension will be documented in this file.
 
 ### 0.7.3
 * Added passphrase prompt.
@@ -42,4 +42,4 @@ All notable changes to the "remote-browser" extension will be documented in this
 
 ### 0.5.0
 
-Initial release 
+Initial release

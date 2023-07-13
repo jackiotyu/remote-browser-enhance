@@ -6,13 +6,13 @@ import {ConnConfig} from './ConnConfig';
 
 
 export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
-    
+
 
     private remoteConnection!: RemoteConnection;
     private config!: vscode.WorkspaceConfiguration;
     private root: FileNode = new FileNode('.', true, undefined);
-    public _onDidChangeTreeData: vscode.EventEmitter<FileNode | null | undefined> = new vscode.EventEmitter<FileNode | null | undefined>();
-    public readonly onDidChangeTreeData: vscode.Event<FileNode | null | undefined> = this._onDidChangeTreeData.event;
+    public _onDidChangeTreeData: vscode.EventEmitter<FileNode | void> = new vscode.EventEmitter<FileNode |void>();
+    public readonly onDidChangeTreeData: vscode.Event<FileNode | void> = this._onDidChangeTreeData.event;
 
 
     constructor(config: vscode.WorkspaceConfiguration) {
@@ -54,26 +54,30 @@ export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
     }
 
     public async getFile(remotePath: string) {
+        console.log('remotePath', remotePath);
         try {
             await this.remoteConnection.connection;
-            console.log("Obatined list");
+            console.log("get list🎈🎈🎈🎈");
         }
         catch (e) {
             console.log(e);
         }
         const localPath = await this.remoteConnection.get_file(remotePath);
-        vscode.workspace.openTextDocument(localPath).then((textDocument: vscode.TextDocument) => {
+        // 使用vscode.open命令打开文件
+        let fileUri = vscode.Uri.file(localPath);
+        vscode.commands.executeCommand('vscode.open', fileUri);
+        // vscode.workspace.openTextDocument(localPath).then((textDocument: vscode.TextDocument) => {
 
-            vscode.window.showTextDocument(textDocument, {preview: false}).then((textEditor: vscode.TextEditor) => {
+        //     vscode.window.showTextDocument(textDocument, {preview: false}).then((textEditor: vscode.TextEditor) => {
 
-                // Watch for file save
-                vscode.workspace.onDidSaveTextDocument((doc: vscode.TextDocument) => {
-                    if (doc === textDocument) {
-                        this.remoteConnection.put_file(remotePath, localPath);
-                    }
-                });
-            });
-        });
+        //         // Watch for file save
+        //         vscode.workspace.onDidSaveTextDocument((doc: vscode.TextDocument) => {
+        //             if (doc === textDocument) {
+        //                 this.remoteConnection.put_file(remotePath, localPath);
+        //             }
+        //         });
+        //     });
+        // });
 
     }
 
@@ -83,7 +87,7 @@ export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
 
     public async getChildren(element?: FileNode): Promise<FileNode[]> {
 
-        /* Handling connection promises gets iffy due to multiple failure and race conditions. 
+        /* Handling connection promises gets iffy due to multiple failure and race conditions.
            Instead, we wait for onDidChangeTreeData to be fired after a connection is successful
         */
         if(!this.remoteConnection) {
@@ -93,7 +97,7 @@ export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
         if(this.remoteConnection.connStatus !== ConnectionStatus.Connected) {
             return [];
         }
-        
+
         if (element) {
             return await this.remoteConnection.get_list(element);
         }

@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
     let config = vscode.workspace.getConfiguration('');
     let remoteTree: RemoteFileTreeProvider = new RemoteFileTreeProvider(config);
 
-    context.subscriptions.push(vscode.commands.registerCommand('remoteBrowser.disconnect', () => {
+    context.subscriptions.push(vscode.commands.registerCommand('remoteBrowserEnhance.disconnect', () => {
         remoteTree.endSession()
             .then(() => displayNotif('Disconnected'))
             .catch((e) => {
@@ -27,21 +27,21 @@ export function activate(context: vscode.ExtensionContext) {
                 logError(e);
             });
     }));
-    console.log('remote-browser is now active');
+    console.log('remote-browser-enhance is now active');
 
     // Register Connect Command
-    let connCmd = vscode.commands.registerCommand('remoteBrowser.connect', () => {
+    let connCmd = vscode.commands.registerCommand('remoteBrowserEnhance.connect', () => {
 
         // Config may change
         config = vscode.workspace.getConfiguration('');
 
         let hosts: QPItem[] = [];
-        let remoteBrowserConnectionOptions: any = config.get('remoteBrowser.connectionOptions');
-        let additionalConnections: Array<any> | undefined = config.get('remoteBrowser.additionalConnections');
+        let remoteBrowserEnhanceConnectionOptions: any = config.get('remoteBrowserEnhance.connectionOptions');
+        let additionalConnections: Array<any> | undefined = config.get('remoteBrowserEnhance.additionalConnections');
 
         if(additionalConnections && additionalConnections.length > 0) {
             // Show quick pick if additional connections are configured
-            hosts.push(new QPItem(remoteBrowserConnectionOptions));
+            hosts.push(new QPItem(remoteBrowserEnhanceConnectionOptions));
             additionalConnections.forEach((connectConfig: ConnConfig) => {
                 hosts.push(new QPItem(connectConfig));
             });
@@ -52,12 +52,12 @@ export function activate(context: vscode.ExtensionContext) {
             });
         }
         else {
-            remoteTree.connect(config, remoteBrowserConnectionOptions);
+            remoteTree.connect(config, remoteBrowserEnhanceConnectionOptions);
         }
     });
 
     // Register Path change Command
-    let cpCmd = vscode.commands.registerCommand("remoteBrowser.changePath", (path: string) => {
+    let cpCmd = vscode.commands.registerCommand("remoteBrowserEnhance.changePath", (path: string) => {
         // If command is invoked by user, prompt for path
         if (!path) {
             vscode.window.showInputBox({ placeHolder: 'Enter Absolute Remote Path' }).then(p => {
@@ -71,24 +71,23 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     // Register Path change Command
-    let opCmd = vscode.commands.registerCommand("remoteBrowser.openFile", (path: string) => {
+    let opCmd = vscode.commands.registerCommand("remoteBrowserEnhance.openFile", (path: string) => {
         remoteTree.getFile(path);
     });
 
     // Register filter
-    context.subscriptions.push(vscode.commands.registerCommand("remoteBrowser.filter", () => {
+    context.subscriptions.push(vscode.commands.registerCommand("remoteBrowserEnhance.filter", () => {
         vscode.window.showInputBox({ placeHolder: 'Enter Filter Regex. Leave blank to clear filter' }).then(p => {
             remoteTree.filter(p);
         });
     }));
 
     // Register makeRoot
-    context.subscriptions.push(vscode.commands.registerCommand("remoteBrowser.makeRoot", (node: any) => {
+    context.subscriptions.push(vscode.commands.registerCommand("remoteBrowserEnhance.makeRoot", (node: any) => {
         if(node) {
             // If target is a file, route to parent directory of the file
             remoteTree.changePath(node.isDir ? node.remotePath : node.parent.remotePath);
         }
-        
     }));
 
     context.subscriptions.push(cpCmd);

@@ -1,15 +1,15 @@
 import * as vscode from 'vscode';
 
 export function logError(e: string) {
-    console.error(`remote-browser ERROR: ${e}`);
+    console.error(`remote-browser-enhance ERROR: ${e}`);
 }
 
 export function displayError(e: string) {
-    vscode.window.showErrorMessage(`remote-browser : ${e}`);
+    vscode.window.showErrorMessage(`remote-browser-enhance : ${e}`);
 }
 
 export function displayNotif(n: string) {
-    vscode.window.showInformationMessage(`remote-browser : ${n}`);
+    vscode.window.showInformationMessage(`remote-browser-enhance : ${n}`);
 }
 
 export class StatusBarItem {

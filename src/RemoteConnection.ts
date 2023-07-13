@@ -1,4 +1,4 @@
-import * as sftpclient from 'ssh2-sftp-client';
+import SFTP from 'ssh2-sftp-client';
 import {ConnConfig} from './ConnConfig';
 import { FileNode } from './FileNode';
 import * as fs from 'fs';
@@ -17,17 +17,17 @@ export enum ConnectionStatus {
 
 
 // Abstraction over ssh2-sftp-client
-export class RemoteConnection extends sftpclient {
+export class RemoteConnection extends SFTP {
 
     connection: Promise<void>;
     filter?: RegExp | undefined;
     config: vscode.WorkspaceConfiguration;
     // An event to fire after the connection is successful
-    event?: vscode.EventEmitter<FileNode | null | undefined>;
+    event?: vscode.EventEmitter<FileNode | void>;
     connStatus: ConnectionStatus = ConnectionStatus.Off;
     statusBar: StatusBarItem;
 
-    constructor(config: vscode.WorkspaceConfiguration, connectConfig: ConnConfig, event: vscode.EventEmitter<FileNode | null | undefined>,
+    constructor(config: vscode.WorkspaceConfiguration, connectConfig: ConnConfig, event: vscode.EventEmitter<FileNode | void>,
         callback: () => void) {
         super();
         this.statusBar = new StatusBarItem();
@@ -103,7 +103,7 @@ export class RemoteConnection extends sftpclient {
         try {
             this.filter = regexQuery ? new RegExp(regexQuery) : undefined;
         }
-        catch (e) {
+        catch (e: any) {
             logError(e);
             displayError('Regex Error');
         }
@@ -113,11 +113,11 @@ export class RemoteConnection extends sftpclient {
 
     /* sftp-ls on directory path*/
     public async get_list(dirPath?: FileNode) {
-        let file_list: Array<sftpclient.FileInfo> = [];
+        let file_list: Array<SFTP.FileInfo> = [];
         try {
             file_list = await this.list(dirPath ? dirPath.remotePath : '.');
         }
-        catch (e) {
+        catch (e: any) {
             logError(e);
             displayError('Error in obtaining directory contents');
         }
@@ -152,15 +152,18 @@ export class RemoteConnection extends sftpclient {
                 if (!fs.existsSync(dir)) {
                     fs.mkdirSync(dir);
                 }
-            } catch (e) {
+            } catch (e: any) {
                 displayError('Error in obtaining local Directory. Make sure path is correct.');
                 logError(e);
             }
         }
 
-        let conf_dir = this.config.get<string>('remoteBrowser.tmpFolder');
+        let conf_dir = this.config.get<string>('remoteBrowserEnhance.tmpFolder');
         if (!conf_dir) {
-            conf_dir =  os.tmpdir();
+            conf_dir = path.join(os.tmpdir(), 'remote-browser-enhance');
+            if(!fs.existsSync(conf_dir)){
+                fs.mkdirSync(conf_dir);
+            }
         }
         else {
             createDir(conf_dir);
@@ -212,7 +215,7 @@ export class RemoteConnection extends sftpclient {
 
             */
         }
-        catch (e) {
+        catch (e: any) {
             logError(e);
             displayError('Error in downloading file');
         }
@@ -223,7 +226,7 @@ export class RemoteConnection extends sftpclient {
     /* sftp-put on file path */
     public async put_file(remotePath: string, localPath: string) {
         this.statusBar.updateStatusBarProgress(`Saving file...`);
-        this.put(localPath, remotePath, false, 'utf8').then((res) => {
+        this.put(localPath, remotePath, {}).then((res) => {
             console.log('File saved to ' + remotePath);
             this.statusBar.updateStatusBarSuccess(`Saved File successfully in remote`);
         }).catch((err) => {

@@ -1,4 +1,4 @@
-import { TreeItem, TreeItemCollapsibleState, ThemeIcon } from 'vscode';
+import { TreeItem, TreeItemCollapsibleState, ThemeIcon, Uri } from 'vscode';
 
 // Tree Item representing a remote file or directory
 export class FileNode extends TreeItem {
@@ -19,12 +19,14 @@ export class FileNode extends TreeItem {
         }
 
         this.isDir = isDir;
+        this.resourceUri = Uri.parse(filename);
+        this.contextValue = this.isDir ? 'remoteExplorer.Dir' : 'remoteExplorer.File';
         this.collapsibleState = isDir ? TreeItemCollapsibleState.Collapsed : TreeItemCollapsibleState.None;
-        this.iconPath = ThemeIcon.Folder;
+        this.iconPath = this.isDir ? ThemeIcon.Folder : ThemeIcon.File;
         // Associate a change in tree root path with ..
         if (filename === '..') {
             this.command = {
-                command: 'remoteBrowser.changePath',
+                command: 'remoteBrowserEnhance.changePath',
                 title: 'Change Path',
                 arguments: [this.remotePath]
             };
@@ -34,10 +36,10 @@ export class FileNode extends TreeItem {
         else if(!isDir) {
             this.iconPath = ThemeIcon.File;
             this.command = {
-                command: 'remoteBrowser.openFile',
+                command: 'remoteBrowserEnhance.openFile',
                 title: 'Change Path',
                 arguments: [this.remotePath]
-            };  
+            };
         }
     }
 }
