@@ -75,6 +75,10 @@
                 "command": "remoteBrowserEnhance.terminal",
                 "title": "remote-browser-enhance: Terminal",
                 "icon": "$(terminal-bash)"
+            },
+            {
+                "command": "remoteBrowserEnhance.copy",
+                "title": "remote-browser-enhance: Copy"
             }
         ],
         "views": {
@@ -110,8 +114,13 @@
             ],
             "view/item/context": [
                 {
+                    "command": "remoteBrowserEnhance.copy",
+                    "when": "view == remoteExplorer",
+                    "group": "navigation"
+                },
+                {
                     "command": "remoteBrowserEnhance.makeRoot",
-                    "when": "view == remoteExplorer && viewItem === remoteExplorer.Dir",
+                    "when": "view == remoteExplorer && viewItem == remoteExplorer.Dir",
                     "group": "navigation"
                 }
             ]

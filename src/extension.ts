@@ -4,6 +4,7 @@ import { logError, displayError, displayNotif } from './Common';
 import { ConnConfig } from './ConnConfig';
 
 import { RemoteFileTreeProvider } from './RemoteFileTreeProvider';
+import { FileNode } from './FileNode';
 
 import { DnDController } from './DnDController';
 import { installTerminal } from './RemoteTerminal';
@@ -75,6 +76,12 @@ export function activate(context: vscode.ExtensionContext) {
     // Register Path change Command
     let opCmd = vscode.commands.registerCommand('remoteBrowserEnhance.openFile', (path: string) => {
         remoteTree.getFile(path);
+    });
+
+    const copyCmd = vscode.commands.registerCommand('remoteBrowserEnhance.copy', (item: FileNode) => {
+        if(!item) {return;}
+        vscode.env.clipboard.writeText(item.remotePath);
+        vscode.window.showInformationMessage('Copy path success: ' + item.remotePath);
     });
 
     installTerminal(context);
