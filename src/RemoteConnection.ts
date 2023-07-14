@@ -7,6 +7,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { logError, displayError, displayNotif, StatusBarItem } from './Common';
+import { watch, FSWatcher } from 'chokidar';
 
 
 export enum ConnectionStatus {
@@ -27,6 +28,8 @@ export class RemoteConnection extends SFTP {
     connStatus: ConnectionStatus = ConnectionStatus.Off;
     statusBar: StatusBarItem;
 
+    fileWatcher?: FSWatcher;
+
     constructor(config: vscode.WorkspaceConfiguration, connectConfig: ConnConfig, event: vscode.EventEmitter<FileNode | void>,
         callback: () => void) {
         super();
@@ -44,6 +47,21 @@ export class RemoteConnection extends SFTP {
                 this.get('.').then(() => { }).catch((e) => { });
             }
         }, 60000);
+    }
+
+    dispose() {
+        this.fileWatcher?.close();
+    }
+
+    private checkFileWatcher(dirPath: string) {
+        if(this.fileWatcher) {return;}
+        this.fileWatcher = watch(dirPath, {
+            ignoreInitial: true,
+            atomic: true
+        });
+        this.fileWatcher.on('change', (filePath) => {
+            console.log('change file', filePath);
+        });
     }
 
     private conn(connectConfig: ConnConfig, callback: () => void): Promise<void> {
@@ -161,13 +179,13 @@ export class RemoteConnection extends SFTP {
         let conf_dir = this.config.get<string>('remoteBrowserEnhance.tmpFolder');
         if (!conf_dir) {
             conf_dir = path.join(os.tmpdir(), 'remote-browser-enhance');
-            if(!fs.existsSync(conf_dir)){
-                fs.mkdirSync(conf_dir);
-            }
+            createDir(conf_dir);
         }
         else {
             createDir(conf_dir);
         }
+
+        this.checkFileWatcher(conf_dir);
 
         /*  Use a hash of the remote path to create a local directory for a file.
             Ensures that no conflict occurs on different files with the same name */

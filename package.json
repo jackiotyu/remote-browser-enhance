@@ -129,22 +129,25 @@
         "test": "node ./out/test/runTest.js"
     },
     "devDependencies": {
-        "@types/vscode": "^1.78.0",
         "@types/glob": "^8.1.0",
         "@types/mocha": "^10.0.1",
         "@types/node": "16.x",
+        "@types/vscode": "^1.78.0",
         "@typescript-eslint/eslint-plugin": "^5.59.1",
         "@typescript-eslint/parser": "^5.59.1",
         "eslint": "^8.39.0",
         "glob": "^8.1.0",
         "mocha": "^10.2.0",
-        "typescript": "^5.0.4",
         "ts-loader": "^9.4.2",
+        "typescript": "^5.0.4",
         "webpack": "^5.81.0",
         "webpack-cli": "^5.0.2"
     },
     "dependencies": {
         "@types/ssh2-sftp-client": "^2.4.0",
-        "ssh2-sftp-client": "^2.4.3"
+        "chokidar": "^3.5.3",
+        "ssh2": "^1.14.0",
+        "ssh2-sftp-client": "^2.4.3",
+        "vscode-telnet-pty": "^1.0.0"
     }
 }

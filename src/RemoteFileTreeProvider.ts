@@ -39,6 +39,7 @@ export class RemoteFileTreeProvider implements TreeDataProvider<TreeItem> {
         return this.remoteConnection.end().then((res) => {
             this.remoteConnection.connStatus = ConnectionStatus.Disconnected;
             this.remoteConnection.statusBar.dispose();
+            this.remoteConnection.dispose();
             this._onDidChangeTreeData.fire();
         });
     }
