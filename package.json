@@ -77,8 +77,8 @@
                 "icon": "$(terminal-bash)"
             },
             {
-                "command": "remoteBrowserEnhance.copy",
-                "title": "remote-browser-enhance: Copy"
+                "command": "remoteBrowserEnhance.copyPath",
+                "title": "remote-browser-enhance: Copy Path"
             }
         ],
         "views": {
@@ -114,7 +114,7 @@
             ],
             "view/item/context": [
                 {
-                    "command": "remoteBrowserEnhance.copy",
+                    "command": "remoteBrowserEnhance.copyPath",
                     "when": "view == remoteExplorer",
                     "group": "navigation"
                 },

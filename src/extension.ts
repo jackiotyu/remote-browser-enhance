@@ -78,7 +78,7 @@ export function activate(context: vscode.ExtensionContext) {
         remoteTree.getFile(path);
     });
 
-    const copyCmd = vscode.commands.registerCommand('remoteBrowserEnhance.copy', (item: FileNode) => {
+    const copyCmd = vscode.commands.registerCommand('remoteBrowserEnhance.copyPath', (item: FileNode) => {
         if(!item) {return;}
         vscode.env.clipboard.writeText(item.remotePath);
         vscode.window.showInformationMessage('Copy path success: ' + item.remotePath);
